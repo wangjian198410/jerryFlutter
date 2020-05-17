@@ -1,5 +1,7 @@
+import 'package:hnapp/src/model/article.dart';
 import "package:test/test.dart";
-import 'package:hnapp/src/util/json_parse.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 void main() {
   test('parse topstories.json', () {
@@ -24,5 +26,22 @@ void main() {
     }''';
 
     expect(parseArticle(jsonString).by, 'dhouston');
+  });
+
+  test('parse item.json over network', () async {
+    final url = 'https://hacker-news.firebaseio.com/v0/beststories.json';
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final idList = json.decode(response.body);
+      if (idList.isNotEmpty) {
+        final articleUrl =
+            'https://hacker-news.firebaseio.com/v0/item/${idList.first}.json';
+        final articleRes = await http.get(articleUrl);
+        if (articleRes.statusCode == 200) {
+          Article article = parseArticle(articleRes.body);
+          expect(article.by, 'dvt');
+        }
+      }
+    }
   });
 }
