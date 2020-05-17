@@ -38,7 +38,7 @@ void main() {
             'https://hacker-news.firebaseio.com/v0/item/${idList.first}.json';
         final articleRes = await http.get(articleUrl);
         if (articleRes.statusCode == 200) {
-          Article article = parseArticle(articleRes.body);
+          final Article article = parseArticle(articleRes.body);
           expect(article.by, 'dvt');
         }
       }

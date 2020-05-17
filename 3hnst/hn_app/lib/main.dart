@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'src/model/article.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
 
@@ -27,7 +28,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Article> _article = articles;
+  List<int> _ids = [23185131];
+  // ignore: missing_return
+  Future<Article> _getArticle(int id) async {
+    final storyUrl = 'https://hacker-news.firebaseio.com/v0/item/$id.json';
+    final storyRes = await http.get(storyUrl);
+    if (storyRes.statusCode == 200) {
+      return parseArticle(storyRes.body);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,37 +44,39 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await Future.delayed(const Duration(seconds: 1));
-          setState(() {
-            _article.removeAt(0);
-          });
-        },
-        child: ListView(
-            children: _article.map((article) {
-          return _buildItem(article);
-        }).toList()),
+      body: ListView(
+        children: _ids
+            .map((i) => FutureBuilder<Article>(
+                  future: _getArticle(i),
+                  builder:
+                      (BuildContext context, AsyncSnapshot<Article> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.done) {
+                      return _buildItem(snapshot.data);
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ))
+            .toList(),
       ),
     );
   }
 
   Widget _buildItem(Article article) {
     return Padding(
-      key: Key(article.text),
+      //key: Key(article.title),
       padding: const EdgeInsets.all(18.0),
       child: ExpansionTile(
-        title: new Text(article.text, style: new TextStyle(fontSize: 24)),
+        title: Text(article.title, style: TextStyle(fontSize: 24.0)),
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              new Text("${article.commentsCount} comments",
-                  style: new TextStyle(fontSize: 24)),
-              new IconButton(
-                icon: new Icon(Icons.launch),
+              Text(article.type),
+              IconButton(
+                icon: Icon(Icons.launch),
                 onPressed: () {
-                  _launchURL(article.domain);
+                  _launchURL(article.url);
                 },
                 color: Colors.teal,
               ),
