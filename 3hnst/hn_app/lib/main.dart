@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'src/model/article.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,30 +16,37 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
+
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  List<Article> _article = articles;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(widget.title),
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              'hello world',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: _article.map((article) {
+              return _buildItem(article);
+            }).toList()),
       ),
+    );
+  }
+
+  Widget _buildItem(Article article) {
+    return ListTile(
+      title: new Text(article.text, style: new TextStyle(fontSize: 24)),
     );
   }
 }
