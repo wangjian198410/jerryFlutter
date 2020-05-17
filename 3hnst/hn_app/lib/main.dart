@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'src/model/article.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() => runApp(MyApp());
 
@@ -34,19 +35,52 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await Future.delayed(const Duration(seconds: 1));
+          setState(() {
+            _article.removeAt(0);
+          });
+        },
+        child: ListView(
             children: _article.map((article) {
-              return _buildItem(article);
-            }).toList()),
+          return _buildItem(article);
+        }).toList()),
       ),
     );
   }
 
   Widget _buildItem(Article article) {
-    return ListTile(
-      title: new Text(article.text, style: new TextStyle(fontSize: 24)),
+    return Padding(
+      padding: const EdgeInsets.all(18.0),
+      child: ExpansionTile(
+        title: new Text(article.text, style: new TextStyle(fontSize: 24)),
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              new Text("${article.commentsCount} comments",
+                  style: new TextStyle(fontSize: 24)),
+              new IconButton(
+                icon: new Icon(Icons.launch),
+                onPressed: () {
+                  _launchURL(article.domain);
+                },
+                color: Colors.teal,
+              ),
+            ],
+          )
+        ],
+      ),
     );
+  }
+
+  _launchURL(String showUrl) async {
+    final targetUrl = "http://$showUrl";
+    if (await canLaunch(targetUrl)) {
+      await launch(targetUrl);
+    } else {
+      throw 'Could not launch $targetUrl';
+    }
   }
 }
