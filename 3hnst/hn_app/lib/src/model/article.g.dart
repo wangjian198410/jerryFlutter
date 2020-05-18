@@ -30,20 +30,10 @@ class _$ArticleSerializer implements StructuredSerializer<Article> {
       serializers.serialize(object.kids,
           specifiedType:
               const FullType(BuiltList, const [const FullType(int)])),
-      'url',
-      serializers.serialize(object.url, specifiedType: const FullType(String)),
-      'score',
-      serializers.serialize(object.score, specifiedType: const FullType(int)),
-      'title',
-      serializers.serialize(object.title,
-          specifiedType: const FullType(String)),
       'parts',
       serializers.serialize(object.parts,
           specifiedType:
               const FullType(BuiltList, const [const FullType(int)])),
-      'descendants',
-      serializers.serialize(object.descendants,
-          specifiedType: const FullType(int)),
     ];
     if (object.deleted != null) {
       result
@@ -73,6 +63,30 @@ class _$ArticleSerializer implements StructuredSerializer<Article> {
       result
         ..add('poll')
         ..add(serializers.serialize(object.poll,
+            specifiedType: const FullType(int)));
+    }
+    if (object.url != null) {
+      result
+        ..add('url')
+        ..add(serializers.serialize(object.url,
+            specifiedType: const FullType(String)));
+    }
+    if (object.score != null) {
+      result
+        ..add('score')
+        ..add(serializers.serialize(object.score,
+            specifiedType: const FullType(int)));
+    }
+    if (object.title != null) {
+      result
+        ..add('title')
+        ..add(serializers.serialize(object.title,
+            specifiedType: const FullType(String)));
+    }
+    if (object.descendants != null) {
+      result
+        ..add('descendants')
+        ..add(serializers.serialize(object.descendants,
             specifiedType: const FullType(int)));
     }
     return result;
@@ -227,20 +241,8 @@ class _$Article extends Article {
     if (kids == null) {
       throw new BuiltValueNullFieldError('Article', 'kids');
     }
-    if (url == null) {
-      throw new BuiltValueNullFieldError('Article', 'url');
-    }
-    if (score == null) {
-      throw new BuiltValueNullFieldError('Article', 'score');
-    }
-    if (title == null) {
-      throw new BuiltValueNullFieldError('Article', 'title');
-    }
     if (parts == null) {
       throw new BuiltValueNullFieldError('Article', 'parts');
-    }
-    if (descendants == null) {
-      throw new BuiltValueNullFieldError('Article', 'descendants');
     }
   }
 

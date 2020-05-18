@@ -1,9 +1,14 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'src/model/article.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
+import 'src/util/myHttpOverrides.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  HttpOverrides.global = new MyHttpOverrides();
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -28,13 +33,14 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<int> _ids = [23185131];
-  // ignore: missing_return
+  List<int> _ids = [23205588, 23185131, 23194727, 23192546, 23197966];
   Future<Article> _getArticle(int id) async {
     final storyUrl = 'https://hacker-news.firebaseio.com/v0/item/$id.json';
     final storyRes = await http.get(storyUrl);
     if (storyRes.statusCode == 200) {
       return parseArticle(storyRes.body);
+    } else {
+      throw Exception('Failed to load data ');
     }
   }
 
@@ -64,10 +70,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildItem(Article article) {
     return Padding(
-      //key: Key(article.title),
+      key: Key(article.title),
       padding: const EdgeInsets.all(18.0),
       child: ExpansionTile(
-        title: Text(article.title, style: TextStyle(fontSize: 24.0)),
+        title:
+            Text(article.title ?? '[null]', style: TextStyle(fontSize: 24.0)),
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -88,11 +95,10 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _launchURL(String showUrl) async {
-    final targetUrl = "http://$showUrl";
-    if (await canLaunch(targetUrl)) {
-      await launch(targetUrl);
+    if (await canLaunch(showUrl)) {
+      await launch(showUrl);
     } else {
-      throw 'Could not launch $targetUrl';
+      throw 'Could not launch $showUrl';
     }
   }
 }

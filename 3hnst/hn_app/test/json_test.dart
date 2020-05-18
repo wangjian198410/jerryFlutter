@@ -39,7 +39,7 @@ void main() {
         final articleRes = await http.get(articleUrl);
         if (articleRes.statusCode == 200) {
           final Article article = parseArticle(articleRes.body);
-          expect(article.by, 'dvt');
+          expect(article.by, 'TTTThis');
         }
       }
     }
