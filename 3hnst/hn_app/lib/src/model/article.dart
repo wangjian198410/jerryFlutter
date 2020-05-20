@@ -59,8 +59,10 @@ abstract class Article implements Built<Article, ArticleBuilder> {
   static Serializer<Article> get serializer => _$articleSerializer;
 }
 
-List<int> parseTopStoryList(String json) {
-  throw UnimplementedError();
+List<int> parseTopStoryList(String jsonStr) {
+  final parsed = json.jsonDecode(jsonStr);
+  final listOfIds = List<int>.from(parsed);
+  return listOfIds;
 }
 
 Article parseArticle(String jsonStr) {
