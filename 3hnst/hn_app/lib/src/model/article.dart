@@ -8,6 +8,10 @@ part 'article.g.dart';
 abstract class Article implements Built<Article, ArticleBuilder> {
   int get id;
 
+  /// This is the type of the article.
+  ///
+  /// It can be any of these: "job", "story", "comment", "poll", or "pollopt".
+
   @nullable
   bool get deleted;
 
