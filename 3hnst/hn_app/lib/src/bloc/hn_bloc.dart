@@ -1,36 +1,53 @@
+import 'dart:async';
 import 'dart:collection';
 import 'package:http/http.dart' as http;
 import 'package:hnapp/src/model/article.dart';
 import 'package:rxdart/subjects.dart';
 
+enum StoriesType {
+  topStories,
+  newStories,
+}
+
 class HackerNewBloc {
   final _articlesSubject = BehaviorSubject<UnmodifiableListView<Article>>();
+  // ignore: close_sinks
+  final _storiesTypeController = StreamController<StoriesType>();
+
+  Sink<StoriesType> get storiesType => _storiesTypeController.sink;
+
   var _articles = <Article>[];
-  List<int> _ids = [
+  List<int> _newIds = [
     23455033,
-    23454557,
-    23438359,
-    23455463,
-    23455309,
-    23454352,
-    23452721,
-    23453308,
-    23456061,
-    23446242,
-    23455208,
-    23452365
   ];
+  List<int> _topIds = [
+    23456061,
+  ];
+
   HackerNewBloc() {
-    _updateArticles().then((_) {
+    _getAndupdateArticles(_topIds);
+    _storiesTypeController.stream.listen((storiesType) {
+      if (storiesType == StoriesType.newStories) {
+        _getAndupdateArticles(_newIds);
+      } else {
+        _getAndupdateArticles(_topIds);
+      }
+    });
+  }
+
+  _getAndupdateArticles(List<int> articleIds) {
+    _updateArticles(articleIds).then((_) {
       _articlesSubject.add(UnmodifiableListView(_articles));
     });
   }
-  Stream<UnmodifiableListView<Article>> get articles => _articlesSubject.stream;
-  Future<Null> _updateArticles() async {
-    final futureArticles = _ids.map((id) => _getArticle(id));
+
+  Future<Null> _updateArticles(List<int> articleIds) async {
+    final futureArticles = articleIds.map((id) => _getArticle(id));
     final articles = await Future.wait(futureArticles);
     _articles = articles;
   }
+
+  Stream<UnmodifiableListView<Article>> get articles => _articlesSubject.stream;
 
   Future<Article> _getArticle(int id) async {
     final storyUrl = 'https://hacker-news.firebaseio.com/v0/item/$id.json';
